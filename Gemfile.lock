@@ -1,0 +1,31 @@
+PATH
+  remote: .
+  specs:
+    diarize-ruby (0.3.0)
+      jblas-ruby
+      rjb
+      to-rdf
+
+GEM
+  remote: http://rubygems.org/
+  specs:
+    jblas-ruby (1.1.1)
+    metaclass (0.0.4)
+    mocha (1.1.0)
+      metaclass (~> 0.0.1)
+    power_assert (0.3.0)
+    rjb (1.5.4)
+    test-unit (3.2.0)
+      power_assert
+    to-rdf (0.0.1)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  diarize-ruby!
+  mocha
+  test-unit (~> 3.0)
+
+BUNDLED WITH
+   1.11.2
