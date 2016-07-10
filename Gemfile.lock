@@ -9,6 +9,7 @@ PATH
 GEM
   remote: http://rubygems.org/
   specs:
+    byebug (9.0.5)
     jblas-ruby (1.1.1)
     metaclass (0.0.4)
     mocha (1.1.0)
@@ -23,6 +24,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  byebug
   diarize-ruby!
   mocha
   test-unit (~> 3.0)

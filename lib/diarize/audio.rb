@@ -26,7 +26,8 @@ module Diarize
     end
 
     def analyze!(train_speaker_models = true)
-      parameter = fr.lium.spkDiarization.parameter.Parameter.new
+      # parameter = fr.lium.spkDiarization.parameter.Parameter.new
+      parameter = Rjb::import('fr.lium.spkDiarization.parameter.Parameter').new
       parameter.show = show
       # 12 MFCC + Energy
       # 1: static coefficients are present in the file
@@ -38,7 +39,7 @@ module Diarize
       # 13: total size of a feature vector in the mfcc file
       # 0:0:0: no feature normalization
       parameter.parameterInputFeature.setFeaturesDescription('audio2sphinx,1:1:0:0:0:0,13,0:0:0:0')
-      parameter.parameterDiarization.cEClustering = true # We use CE clustering by default
+      #parameter.parameterDiarization.cEClustering = true # We use CE clustering by default
       parameter.parameterInputFeature.setFeatureMask(@path)
       @clusters = ester2(parameter)
       @segments = Segmentation.from_clusters(self, @clusters)
@@ -122,25 +123,32 @@ module Diarize
       # but not sure how to access them without changing the Java API
 
       # Start by copying models from the universal background model, one per speaker, using MTrainInit
-      parameter = fr.lium.spkDiarization.parameter.Parameter.new
+      # parameter = fr.lium.spkDiarization.parameter.Parameter.new
+      parameter = Rjb::import("fr.lium.spkDiarization.parameter.Parameter").new
       parameter.parameterInputFeature.setFeaturesDescription('audio2sphinx,1:3:2:0:0:0,13,1:1:300:4')
       parameter.parameterInputFeature.setFeatureMask(@path)
       parameter.parameterInitializationEM.setModelInitMethod('copy')
       parameter.parameterModelSetInputFile.setMask(File.join(File.expand_path(File.dirname(__FILE__)), 'ubm.gmm'))
-      features = fr.lium.spkDiarization.lib.MainTools.readFeatureSet(parameter, @clusters)
-      init_vect = java.util.ArrayList.new(@clusters.cluster_get_size)
-      fr.lium.spkDiarization.programs.MTrainInit.make(features, @clusters, init_vect, parameter)
+      # features = fr.lium.spkDiarization.lib.MainTools.readFeatureSet(parameter, @clusters)
+      features = Rjb::import("fr.lium.spkDiarization.lib.MainTools").readFeatureSet(parameter, @clusters.java_object)
+      # init_vect = java.util.ArrayList.new(@clusters.cluster_get_size)
+      init_vect = Rjb::JavaObjectWrapper.new("java.util.ArrayList", @clusters.java_object.cluster_get_size)
+      # fr.lium.spkDiarization.programs.MTrainInit.make(features, @clusters, init_vect, parameter)
+      Rjb::import("fr.lium.spkDiarization.programs.MTrainInit").make(features, @clusters.java_object, init_vect.java_object, parameter)
 
       # Adapt models to individual speakers detected in the audio, using MTrainMap
-      parameter = fr.lium.spkDiarization.parameter.Parameter.new
+      # parameter = fr.lium.spkDiarization.parameter.Parameter.new
+      parameter = Rjb::import("fr.lium.spkDiarization.parameter.Parameter").new
       parameter.parameterInputFeature.setFeaturesDescription('audio2sphinx,1:3:2:0:0:0,13,1:1:300:4')
       parameter.parameterInputFeature.setFeatureMask(@path)
       parameter.parameterEM.setEMControl('1,5,0.01')
       parameter.parameterVarianceControl.setVarianceControl('0.01,10.0')
       parameter.show = show
       features.setCurrentShow(parameter.show)
-      gmm_vect = java.util.ArrayList.new
-      fr.lium.spkDiarization.programs.MTrainMAP.make(features, @clusters, init_vect, gmm_vect, parameter)
+      # gmm_vect = java.util.ArrayList.new
+      gmm_vect = Rjb::JavaObjectWrapper.new("java.util.ArrayList")
+      # fr.lium.spkDiarization.programs.MTrainMAP.make(features, @clusters, init_vect, gmm_vect, parameter)
+      Rjb::import("fr.lium.spkDiarization.programs.MTrainMAP").make(features, @clusters.java_object, init_vect.java_object, gmm_vect.java_object, parameter)
 
       # Populating the speakers with their GMMs
       gmm_vect.each_with_index do |speaker_model, i|
@@ -149,10 +157,13 @@ module Diarize
     end
 
     def ester2(parameter)
-      diarization = fr.lium.spkDiarization.system.Diarization.new
+      # diarization = fr.lium.spkDiarization.system.Diarization.new
+      diarization = Rjb::import('fr.lium.spkDiarization.system.Diarization').new
       parameterDiarization = parameter.parameterDiarization
-      clusterSet = diarization.initialize__method(parameter)
-      featureSet = fr.lium.spkDiarization.system.Diarization.load_feature(parameter, clusterSet, parameter.parameterInputFeature.getFeaturesDescString())
+      # clusterSet = diarization.initialize__method(parameter)
+      clusterSet = diarization.initialize(parameter)
+      # featureSet = fr.lium.spkDiarization.system.Diarization.load_feature(parameter, clusterSet, parameter.parameterInputFeature.getFeaturesDescString())
+      featureSet = Rjb::import('fr.lium.spkDiarization.system.Diarization').load_feature(parameter, clusterSet, parameter.parameterInputFeature.getFeaturesDescString())
       featureSet.setCurrentShow(parameter.show)
       nbFeatures = featureSet.getNumberOfFeatures
       clusterSet.getFirstCluster().firstSegment().setLength(nbFeatures) unless parameter.parameterDiarization.isLoadInputSegmentation
@@ -170,7 +181,7 @@ module Diarize
         # and the resulting segmentation is sufficient for a transcription system.
         clusters = diarization.speakerClustering(parameterDiarization.getThreshold("c"), "ce", clusterSet, clusters, featureSet, parameter)
       end
-      clusters
+      Rjb::JavaObjectWrapper.new(clusters)
     end
 
   end

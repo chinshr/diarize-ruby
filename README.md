@@ -43,7 +43,7 @@ identification.
     $ jruby -S irb
     > require 'diarize'
     > audio = Diarize::Audio.new URI('http://example.com/file.wav')
-    > audio = Diarize::Audio.new URI.join('file:///', '/Users/juergen/work/diarize-jruby/test/data/foo.wav')
+    > audio = Diarize::Audio.new URI.join('file:///', '/Users/juergen/work/ruby/diarize-ruby/test/data/will-and-juergen.wav')
     > audio.analyze!
     > audio.segments
     > audio.speakers
@@ -89,7 +89,7 @@ IEEE Signal Processing Letters, 2006, 13, 308-311
 
 ## Licensing terms and authorship
 
-See 'COPYING' and 'AUTHORS' files.
+See 'LICENSE' and 'AUTHORS' files.
 
 All code here, except where otherwise indicated, is licensed under
 the GNU Affero General Public License version 3. This license includes
@@ -100,3 +100,8 @@ This library includes a binary JAR file from the LIUM project, which code
 is licensed under the GNU General Public License version 2. See
 http://lium3.univ-lemans.fr/diarization/doku.php/licence for more
 information.
+
+
+## Developer Resources
+
+* http://nofail.de/2010/04/ruby-in-java-java-in-ruby-jruby-or-ruby-java-bridge/

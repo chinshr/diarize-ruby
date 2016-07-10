@@ -1,12 +1,12 @@
 require 'rubygems'
 require 'to_rdf'
-require 'jblas'
+# require 'jblas'
 
 module Diarize
 
   class Speaker
 
-    include JBLAS
+    # include JBLAS
 
     @@log_likelihood_threshold = -33
     @@detection_threshold = 0.2

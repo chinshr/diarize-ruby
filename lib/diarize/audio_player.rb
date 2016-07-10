@@ -1,5 +1,3 @@
-require 'java'
-
 module Diarize
 
   class AudioPlayer

@@ -2,7 +2,7 @@ module Diarize
 
   class SuperVector
 
-    include JBLAS
+    # include JBLAS
 
     attr_reader :vector
 

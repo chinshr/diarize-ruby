@@ -1,5 +1,3 @@
-require File.join(File.expand_path(File.dirname(__FILE__)), 'segment')
-
 module Diarize
 
   class Segmentation
@@ -21,13 +19,13 @@ module Diarize
 
     def self.from_clusters(audio, clusters)
       segmentation = []
-      clusters.each do |speaker_id|
-        cluster = clusters.get_cluster(speaker_id)
+      clusters.map(&:to_s).each do |speaker_id|
+        cluster = clusters.getCluster(speaker_id)
         gender = cluster.gender
         bandwidth = cluster.bandwidth
         cluster.each do |segment|
-          start = segment.start_in_second
-          duration = segment.length_in_second
+          start        = segment.start_in_second
+          duration     = segment.length_in_second
           segmentation << Segment.new(audio, start, duration, gender, bandwidth, speaker_id)
         end
       end
