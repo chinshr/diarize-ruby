@@ -17,11 +17,12 @@ class TestAudio < Test::Unit::TestCase
   end
 
   def test_initialize_http_uri
-    Kernel.expects(:system).with("wget http://example.com/test.wav -O /tmp/http%3A%2F%2Fexample.com%2Ftest.wav").returns(true)
-    File.expects(:new).with('/tmp/http%3A%2F%2Fexample.com%2Ftest.wav').returns(true)
+    hash = Digest::MD5.hexdigest('http://example.com/test.wav')
+    Kernel.expects(:system).with("wget http://example.com/test.wav -O /tmp/#{hash}").returns(true)
+    File.expects(:new).with('/tmp/' + hash).returns(true)
     audio_uri = URI('http://example.com/test.wav')
     audio = Diarize::Audio.new audio_uri
-    assert_equal audio.path, '/tmp/http%3A%2F%2Fexample.com%2Ftest.wav'
+    assert_equal audio.path, '/tmp/' + hash
   end
 
   def test_clean_local_file
@@ -32,11 +33,12 @@ class TestAudio < Test::Unit::TestCase
   end
 
   def test_clean_http_file
-    Kernel.expects(:system).with("wget http://example.com/test.wav -O /tmp/http%3A%2F%2Fexample.com%2Ftest.wav").returns(true)
-    File.expects(:new).with('/tmp/http%3A%2F%2Fexample.com%2Ftest.wav').returns(true)
+    hash = Digest::MD5.hexdigest('http://example.com/test.wav')
+    Kernel.expects(:system).with("wget http://example.com/test.wav -O /tmp/#{hash}").returns(true)
+    File.expects(:new).with('/tmp/' + hash).returns(true)
     audio_uri = URI('http://example.com/test.wav')
     audio = Diarize::Audio.new audio_uri
-    File.expects(:delete).with('/tmp/http%3A%2F%2Fexample.com%2Ftest.wav').returns(true)
+    File.expects(:delete).with('/tmp/' + hash).returns(true)
     audio.clean!
   end
 

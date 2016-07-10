@@ -104,4 +104,6 @@ information.
 
 ## Developer Resources
 
-* http://nofail.de/2010/04/ruby-in-java-java-in-ruby-jruby-or-ruby-java-bridge/
+* [Connecting Ruby to Java and vice versa](http://nofail.de/2010/04/ruby-in-java-java-in-ruby-jruby-or-ruby-java-bridge/)
+* [LIUM scripts](https://github.com/StevenLOL/LIUM/blob/master/ilp_diarization2.sh)
+* [Speaker Identification for the whole World Service Archive](http://www.bbc.co.uk/rd/blog/2014-01-speaker-identification-for-the-whole-world-service-archive)
