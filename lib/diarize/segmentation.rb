@@ -4,7 +4,7 @@ module Diarize
 
     def self.from_seg_file(audio, seg_file)
       segmentation = []
-      File.open(seg_file).lines.each do |line|
+      File.open(seg_file).each_line do |line|
         next if line.start_with? ';;'
         parts = line.split(' ')
         start = parts[2].to_i / 100.0

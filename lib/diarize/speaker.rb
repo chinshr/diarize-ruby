@@ -140,7 +140,7 @@ module Diarize
 
     def rdf_mapping
       { 'ws:gender' => gender, 'ws:model' => model_uri, 'ws:mean_log_likelihood' => model.mean_log_likelihood, 'ws:supervector_hash' => supervector.hash.to_s }
-    end 
+    end
 
     protected
 

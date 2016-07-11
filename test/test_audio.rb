@@ -17,11 +17,12 @@ class TestAudio < Test::Unit::TestCase
   end
 
   def test_initialize_http_uri
-    hash = Digest::MD5.hexdigest('http://example.com/test.wav')
-    Kernel.expects(:system).with("wget http://example.com/test.wav -O /tmp/#{hash}").returns(true)
+    audio_url = 'http://example.com/test.wav'
+    hash = Digest::MD5.hexdigest(audio_url)
     File.expects(:new).with('/tmp/' + hash).returns(true)
-    audio_uri = URI('http://example.com/test.wav')
-    audio = Diarize::Audio.new audio_uri
+    stub_request(:get, audio_url).with(:headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'User-Agent'=>'Ruby'}).
+      to_return(:status => 200, :body => "", :headers => {})
+    audio = Diarize::Audio.new URI(audio_url)
     assert_equal audio.path, '/tmp/' + hash
   end
 
@@ -33,11 +34,12 @@ class TestAudio < Test::Unit::TestCase
   end
 
   def test_clean_http_file
-    hash = Digest::MD5.hexdigest('http://example.com/test.wav')
-    Kernel.expects(:system).with("wget http://example.com/test.wav -O /tmp/#{hash}").returns(true)
+    audio_url = 'http://example.com/test.wav'
+    hash = Digest::MD5.hexdigest(audio_url)
     File.expects(:new).with('/tmp/' + hash).returns(true)
-    audio_uri = URI('http://example.com/test.wav')
-    audio = Diarize::Audio.new audio_uri
+    stub_request(:get, audio_url).with(:headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'User-Agent'=>'Ruby'}).
+      to_return(:status => 200, :body => "", :headers => {})
+    audio = Diarize::Audio.new URI(audio_url)
     File.expects(:delete).with('/tmp/' + hash).returns(true)
     audio.clean!
   end

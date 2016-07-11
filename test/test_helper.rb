@@ -3,6 +3,9 @@ require 'test/unit'
 require 'test/unit/assertions'
 require 'diarize'
 require 'mocha/test_unit'
+require 'webmock/test_unit'
+
+WebMock.disable_net_connect!(:net_http_connect_on_start => true)
 
 class Test::Unit::TestCase
 

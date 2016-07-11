@@ -5,25 +5,24 @@ require File.join(File.expand_path(File.dirname(__FILE__)), 'speaker')
 require 'rubygems'
 require 'to_rdf'
 require 'uri'
+require 'open-uri'
 require 'digest/md5'
 
 module Diarize
 
   class Audio
 
-    attr_reader :path, :file
+    attr_reader :path, :file, :uri
 
-    def initialize(uri)
-      @uri = uri
+    def initialize(url_or_uri)
+      @uri = url_or_uri.is_a?(String) ? URI(url_or_uri) : url_or_uri
       if uri.scheme == 'file'
         # Local file
         @path = uri.path
       else
         # Remote file, we get it locally
-        # @path = '/tmp/' + URI.escape(uri.to_s, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
         @path = '/tmp/' + Digest::MD5.hexdigest(uri.to_s)
-        # Kernel.system("wget #{uri} -O #{@path}")
-        File.open(@path, "wb") {|f| f << uri.read }
+        File.open(@path, "wb") {|f| f << open(uri).read }
       end
 
       if !File.exist?(@path)
