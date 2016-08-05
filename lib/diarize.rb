@@ -86,7 +86,7 @@ module Rjb
           end
           set
         else
-          # Passs other RJB objects off to a handler.
+          # Pass other RJB objects off to a handler.
           wrap_rjb_object(object)
         end # case
       else

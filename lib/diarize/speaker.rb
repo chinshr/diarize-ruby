@@ -61,7 +61,7 @@ module Diarize
     end
 
     def self.divergence(speaker1, speaker2)
-      # TODO bundle in mean_log_likelihood to weight down unlikely models? 
+      # TODO bundle in mean_log_likelihood to weight down unlikely models?
       return unless speaker1.model and speaker2.model
       # MAP Gaussian divergence
       # See "A model space framework for efficient speaker detection", Interspeech'05
@@ -69,7 +69,8 @@ module Diarize
     end
 
     def self.divergence_lium(speaker1, speaker2)
-      fr.lium.spkDiarization.libModel.Distance.GDMAP(speaker1.model, speaker2.model)
+      # fr.lium.spkDiarization.libModel.Distance.GDMAP(speaker1.model, speaker2.model)
+      Rjb::import('fr.lium.spkDiarization.libModel.Distance').GDMAP(speaker1.model, speaker2.model)
     end
 
     def self.divergence_ruby(speaker1, speaker2)
@@ -145,12 +146,15 @@ module Diarize
     protected
 
     def self.read_gmm(filename)
-      gmmlist = java.util.ArrayList.new
-      input = fr.lium.spkDiarization.lib.IOFile.new(filename, 'rb')
+      # gmmlist = java.util.ArrayList.new
+      gmmlist = Rjb::JavaObjectWrapper.new("java.util.ArrayList")
+      # input = fr.lium.spkDiarization.lib.IOFile.new(filename, 'rb')
+      input = Rjb::import('fr.lium.spkDiarization.lib.IOFile').new(filename, 'rb')
       input.open
-      fr.lium.spkDiarization.libModel.ModelIO.readerGMMContainer(input, gmmlist)
+      # fr.lium.spkDiarization.libModel.ModelIO.readerGMMContainer(input, gmmlist)
+      Rjb::import('fr.lium.spkDiarization.libModel.ModelIO').readerGMMContainer(input, gmmlist.java_object)
       input.close
-      gmmlist.to_a.first
+      gmmlist.to_a.first.java_object
     end
 
     def write_gmm(filename, model)
