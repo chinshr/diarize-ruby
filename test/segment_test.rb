@@ -2,7 +2,7 @@ require 'test_helper'
 require 'ostruct'
 require 'uri'
 
-class TestSegment < Test::Unit::TestCase
+class SegmentTest < Test::Unit::TestCase
 
   def test_initialize
     segment = Diarize::Segment.new('audio', 'start', 'duration', 'gender', 'bandwidth', 'speaker_id')
