@@ -1,7 +1,7 @@
 require 'test_helper'
 require 'tempfile'
 
-class TestSpeaker < Test::Unit::TestCase
+class SpeakerTest < Test::Unit::TestCase
 
   def test_detection_threshold
     Diarize::Speaker.detection_threshold = 0.1
