@@ -158,11 +158,14 @@ module Diarize
     end
 
     def write_gmm(filename, model)
-      gmmlist = java.util.ArrayList.new
-      gmmlist << model
-      output = fr.lium.spkDiarization.lib.IOFile.new(filename, 'wb')
+      # gmmlist = java.util.ArrayList.new
+      gmmlist = Rjb::JavaObjectWrapper.new("java.util.ArrayList")
+      # gmmlist << model.components
+      gmmlist.java_object.add(model)
+      # output = fr.lium.spkDiarization.lib.IOFile.new(filename, 'wb')
+      output = Rjb::import('fr.lium.spkDiarization.lib.IOFile').new(filename, 'wb')
       output.open
-      fr.lium.spkDiarization.libModel.ModelIO.writerGMMContainer(output, gmmlist)
+      Rjb::import('fr.lium.spkDiarization.libModel.ModelIO').writerGMMContainer(output, gmmlist.java_object)
       output.close
     end
 

@@ -44,8 +44,8 @@ class TestSpeaker < Test::Unit::TestCase
     speaker = Diarize::Speaker.new(nil, nil, File.join(File.dirname(__FILE__), 'data', 'speaker1.gmm'))
     assert_equal 512 * 24, speaker.supervector.dim
     # Testing the first and the last elements are OK
-    assert_equal speaker.model.components[0].mean(0), speaker.supervector.vector[0]
-    assert_equal speaker.model.components[511].mean(23), speaker.supervector.vector[512 * 24 - 1]
+    assert_equal speaker.model.components.get(0).mean(0), speaker.supervector.vector[0]
+    assert_equal speaker.model.components.get(511).mean(23), speaker.supervector.vector[512 * 24 - 1]
   end
 
   def test_save_and_load_model
@@ -53,7 +53,7 @@ class TestSpeaker < Test::Unit::TestCase
     tmp = Tempfile.new(['diarize-test', '.gmm'])
     speaker.save_model(tmp.path)
     model = Diarize::Speaker.load_model(tmp.path)
-    assert_equal speaker.model.components[0].mean(0), model.components[0].mean(0)
+    assert_equal speaker.model.components.get(0).mean(0), model.components.get(0).mean(0)
     File.delete(tmp.path)
   end
 

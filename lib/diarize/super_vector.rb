@@ -1,9 +1,6 @@
 module Diarize
 
   class SuperVector
-
-    # include JBLAS
-
     attr_reader :vector
 
     def initialize(vector)
@@ -13,52 +10,62 @@ module Diarize
     def self.generate_from_model(model)
       # Generates a supervector from a LIUM GMM
       dim = model.nb_of_components * model.components.get(0).dim
-      vector = DoubleMatrix.new(1, dim)
+      # vector = DoubleMatrix.new(1, dim)
+      # vector = Vector.elements(Array.new(dim, 0))
+      vector = Array.new(dim, 0)
       model.nb_of_components.times do |k|
         gaussian = model.components.get(k)
         gaussian.dim.times do |i|
           vector[k * gaussian.dim + i] = gaussian.mean(i)
         end
       end
-      SuperVector.new(vector)
+      # SuperVector.new(vector)
+      SuperVector.new(Vector.elements(vector))
     end
 
     def self.ubm_gaussian_weights
       # Returns a vector of gaussian weights, same dimension as speaker's super vectors
-      @@ubm_gaussian_weights ||= (
+      @@ubm_gaussian_weights ||= begin
         ubm = Speaker.ubm
-        weights = DoubleMatrix.new(1, ubm.supervector.dim)
+        # weights = DoubleMatrix.new(1, ubm.supervector.dim)
+        weights = Array.new(ubm.supervector.dim, 0)
         ubm.model.nb_of_components.times do |k|
           gaussian = ubm.model.components.get(k)
           gaussian.dim.times do |i|
             weights[k * gaussian.dim + i] = gaussian.weight
           end
         end
-        weights
-      )
+        Vector.elements(weights)
+      end
     end
 
     def self.ubm_covariance
       # Returns a vector of diagonal covariances, same dimension as speaker's super vectors
-      @@ubm_covariance ||= (
+      @@ubm_covariance ||= begin
         ubm = Speaker.ubm
-        cov = DoubleMatrix.new(1, ubm.supervector.dim)
+        # cov = DoubleMatrix.new(1, ubm.supervector.dim)
+        cov = Array.new(ubm.supervector.dim)
         ubm.model.nb_of_components.times do |k|
           gaussian = ubm.model.components.get(k)
           gaussian.dim.times do |i|
             cov[k * gaussian.dim + i] = gaussian.getCovariance(i, i)
           end
         end
-        cov
-      )
+        Vector.elements(cov)
+      end
     end
 
     def self.divergence(sv1, sv2)
-      ubm_gaussian_weights.mul(((sv1.vector - sv2.vector) ** 2) / ubm_covariance).sum
+      # ubm_gaussian_weights.mul(((sv1.vector - sv2.vector) ** 2) / ubm_covariance).sum
+      diff   = sv1.vector - sv2.vector
+      square = diff.map {|el| el ** 2}
+      codiv  = Vector.elements(square.each.with_index.inject([]) {|a,(el,ix)| a << el / ubm_covariance[ix]})
+      mult   = ubm_gaussian_weights.each.with_index.inject([]) {|a,(el,ix)| a << el * codiv[ix]}
+      mult.inject(0, :+)
     end
 
     def dim
-      @vector.columns
+      @vector.size
     end
 
     def hash
