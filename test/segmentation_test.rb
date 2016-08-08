@@ -1,7 +1,7 @@
 require 'test_helper'
 require 'tempfile'
 
-class TestSegmentation < Test::Unit::TestCase
+class SegmentationTest < Test::Unit::TestCase
 
   def test_segmentation_from_empty_seg_file
     audio_uri = URI('file:' + File.join(File.dirname(__FILE__), 'data', 'foo.wav'))
