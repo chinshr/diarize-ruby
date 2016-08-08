@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class TestSuperVector < Test::Unit::TestCase
+class SuperVectorTest < Test::Unit::TestCase
 
   def test_generate_from_model
     model = Diarize::Speaker.load_model(File.join(File.dirname(__FILE__), 'data', 'speaker1.gmm'))
