@@ -1,8 +1,7 @@
 require 'test_helper'
-require 'mocha/setup'
 require 'ostruct'
 
-class TestAudio < Test::Unit::TestCase
+class AudioTest < Test::Unit::TestCase
 
   def setup
     audio_uri = URI('file:' + File.join(File.dirname(__FILE__), 'data', 'foo.wav'))
@@ -55,7 +54,7 @@ class TestAudio < Test::Unit::TestCase
   end
 
   def test_segments
-    @audio.instance_variable_set('@segments', [1, 2, 3])    
+    @audio.instance_variable_set('@segments', [1, 2, 3])
     assert_equal @audio.segments, [1, 2, 3]
   end
 
@@ -67,7 +66,7 @@ class TestAudio < Test::Unit::TestCase
   def test_speakers
     segment1 = OpenStruct.new({ :speaker => 's1' })
     segment2 = OpenStruct.new({ :speaker => 's2' })
-    @audio.instance_variable_set('@segments', [ segment1, segment2, segment1 ]) 
+    @audio.instance_variable_set('@segments', [ segment1, segment2, segment1 ])
     assert_equal @audio.speakers, ['s1', 's2']
   end
 
