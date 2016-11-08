@@ -1,25 +1,25 @@
 # diarize-ruby
 
-This library provides an easy-to-use toolkit for speaker
-segmentation (diarization) and identification from audio.
+This library provides an easy-to-use toolkit for speaker segmentation (diarization) and identification from audio.
 
-This library is being used within the BBC R&D World Service
-archive prototype.
+This library was adopted from [diarize-jruby](https://github.com/bbc/diarize-jruby), being used within the BBC R&D World Service.
 
-See http://worldservice.prototyping.bbc.co.uk/programmes/X0403940 for
-an example.
+The main reason from deviating from the original library is to have a universal that works with either Ruby interpreter. It uses [Ruby Java Bridge](http://rjb.rubyforge.org) instead of [JRuby](http://jruby.org).
 
+Work to be done:
 
-## Speaker diarization
+* Universal gem that works on JRuby and various Ruby implementations (MRI) and versions
+* Use performant math packages tuned to either Ruby implementation
+* Add support for alternative diarization tools
+
+## Speaker Diarization
 
 This library gives acccess to the algorithm developed by the LIUM
 for the ESTER 2 evaluation campaign and described in [Meigner2010].
 
-It wraps a binary JAR file compiled from
-http://lium3.univ-lemans.fr/diarization/doku.php/welcome.
+It wraps a binary JAR file compiled from [LIUM](http://lium3.univ-lemans.fr/diarization/doku.php/welcome).
 
-
-## Speaker identification
+## Speaker Identification
 
 This library also implements an algorithm for speaker identification
 based on the comparison of normalised speaker models, which can be
@@ -36,14 +36,12 @@ It also includes support for speaker supervectors [Campbell2006], which
 can be used in combination with our ruby-lsh library for fast speaker
 identification.
 
+## Examples
 
-## Example use
-
-    $ jruby -S gem install diarize-jruby
-    $ jruby -S irb
-    > require 'diarize'
-    > audio = Diarize::Audio.new URI('http://example.com/file.wav')
-    > audio = Diarize::Audio.new URI.join('file:///', '/Users/juergen/work/ruby/diarize-ruby/test/data/will-and-juergen.wav')
+    $ bundle install
+    $ irb -I lib
+    > require "diarize"
+    > audio = Diarize::Audio.new URI.join('file:///', File.join(File.expand_path(File.dirname(__FILE__)), "test", "data", "will-and-juergen.wav"))
     > audio.analyze!
     > audio.segments
     > audio.speakers
@@ -87,7 +85,7 @@ Proceedings of INTERSPEECH, 2005
 IEEE Signal Processing Letters, 2006, 13, 308-311
 
 
-## Licensing terms and authorship
+## License
 
 See 'LICENSE' and 'AUTHORS' files.
 
