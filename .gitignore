@@ -22,5 +22,5 @@ _yardoc
 .yardoc
 .env
 .env.*
-Gemfile.lock
+/Gemfile.lock
 InstalledFiles

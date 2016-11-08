@@ -22,11 +22,10 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_development_dependency "test-unit", "~> 3.0"
-  spec.add_development_dependency "mocha"
-  spec.add_development_dependency "webmock"
-  spec.add_development_dependency "byebug"
+  spec.add_development_dependency "mocha", "~> 1.1"
+  spec.add_development_dependency "webmock", "~> 2.1"
 
-  spec.add_dependency "rjb"
-  spec.add_dependency "to-rdf"
-  spec.add_dependency "jblas-ruby"
+  spec.add_dependency "rjb", "~> 1.5"
+  spec.add_dependency "to-rdf", "~> 0"
+  spec.add_dependency "jblas-ruby", "~> 1.1"
 end
