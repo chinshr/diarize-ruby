@@ -5,7 +5,9 @@ RJB_OPTIONS   = ['-Xms16m', '-Xmx1024m']
 
 Rjb::load(RJB_LOAD_PATH, RJB_OPTIONS)
 
+require "byebug"
 require "matrix"
+require "audio-playback"
 require "diarize/version"
 require "diarize/lium"
 require "diarize/audio"

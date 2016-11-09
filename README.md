@@ -36,9 +36,17 @@ It also includes support for speaker supervectors [Campbell2006], which
 can be used in combination with our ruby-lsh library for fast speaker
 identification.
 
-## Examples
+## Install
 
     $ bundle install
+
+Note: To make audio playback work with [Audio Playback](https://github.com/arirusso/audio-playback), you should install the following native libraries (homebrew):
+
+    brew install libffi
+    brew install portaudio
+
+## Examples
+
     $ irb -I lib
     > require "diarize"
     > audio = Diarize::Audio.new URI.join('file:///', File.join(File.expand_path(File.dirname(__FILE__)), "test", "data", "will-and-juergen.wav"))
@@ -53,14 +61,13 @@ identification.
     > audio.segments_by_speaker(speakers.first)[0].play
     > audio.segments_by_speaker(speakers.first)[1].play
     > ...
-    > speakers |= other_speakers
+    > speakers ||= other_speakers
     > Diarize::Speaker.match(speakers)
 
 
 ## Running tests
 
     $ rake
-
 
 ## References
 
@@ -84,7 +91,6 @@ Proceedings of INTERSPEECH, 2005
 "Support vector machines using GMM supervectors for speaker verification",
 IEEE Signal Processing Letters, 2006, 13, 308-311
 
-
 ## License
 
 See 'LICENSE' and 'AUTHORS' files.
@@ -98,7 +104,6 @@ This library includes a binary JAR file from the LIUM project, which code
 is licensed under the GNU General Public License version 2. See
 http://lium3.univ-lemans.fr/diarization/doku.php/licence for more
 information.
-
 
 ## Developer Resources
 

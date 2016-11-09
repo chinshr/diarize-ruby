@@ -23,9 +23,9 @@ module Diarize
       Speaker.find_or_create(URI("#{@audio.base_uri}##{@speaker_id}"), @speaker_gender)
     end
 
-    def play
+    def play(options = {})
       player = AudioPlayer.new
-      player.play(@audio.file, start, duration)
+      player.play(@audio.file, options.merge({:start => start, :duration => duration}))
     end
 
     include ToRdf

@@ -2,21 +2,19 @@ module Diarize
 
   class AudioPlayer
 
-    def play(file, start=0.0, duration=10.0)
-      java_file = java.io.File.new(file.path)
-      stream = javax.sound.sampled.AudioSystem.getAudioInputStream(java_file)
-      clip = javax.sound.sampled.AudioSystem.clip
-      clip.open(stream)
-      clip.setMicrosecondPosition(start * 1000000)
-      clip.start
-      begin
-        sleep(duration)
-      rescue Exception
-        $stderr.puts 'Stopping playback'
-      end
-      clip.stop
-      clip.close
-      stream.close
+    def play(file, options = {})
+      output = AudioPlayback::Device::Output.by_id(1) rescue nil
+      defaults = {
+        :channels      => [0, 1],
+        :latency       => 1,
+        :output_device => output,
+        :buffer_size   => 4048
+      }
+      options, stream = defaults.merge(options), nil
+      playback = AudioPlayback.play(file.path, options)
+      stream ||= playback.stream
+      stream.start
+      stream.block
     end
 
   end
