@@ -2,6 +2,7 @@
 
 - Fixed README and examples
 - First round to fix audio playback
+- Move LIUM jar into bin folder
 
 ## [v0.3.0] - 2016-11-08
 
