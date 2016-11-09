@@ -46,6 +46,10 @@ Note: To make audio playback work with [Audio Playback](https://github.com/ariru
     brew install libffi
     brew install portaudio
 
+If you are using a different version of LIUM than what is bundled in the `bin` folder, you can do so by setting an environment variable.
+
+    $ export DIARIZE_RUBY_RJB_LOAD_PATH=<path-to-LIUM-jar-file>
+
 ## Examples
 
     $ irb -I lib
