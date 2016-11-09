@@ -4,13 +4,14 @@ This library provides an easy-to-use toolkit for speaker segmentation (diarizati
 
 This library was adopted from [diarize-jruby](https://github.com/bbc/diarize-jruby), being used within the BBC R&D World Service.
 
-The main reason from deviating from the original library is to have a universal that works with either Ruby interpreter. It uses [Ruby Java Bridge](http://rjb.rubyforge.org) instead of [JRuby](http://jruby.org).
+The main reason from deviating from the original library is to have a universal gem that works with either Ruby interpreter. It uses [Ruby Java Bridge](http://rjb.rubyforge.org) instead of [JRuby](http://jruby.org).
 
 Work to be done:
 
 * Universal gem that works on JRuby and various Ruby implementations (MRI) and versions
 * Use performant math packages tuned to either Ruby implementation
 * Add support for alternative diarization tools
+* Add CI tool
 
 ## Speaker Diarization
 
