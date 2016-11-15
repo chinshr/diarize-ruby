@@ -1,3 +1,7 @@
+## [v0.3.2] - 2016-11-14
+
+- Remove audio player and playback option
+
 ## [v0.3.1] - 2016-11-08
 
 - Fixed README and examples

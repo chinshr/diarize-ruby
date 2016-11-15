@@ -12,7 +12,6 @@ require "diarize/lium"
 require "diarize/audio"
 require "diarize/segment"
 require "diarize/segmentation"
-require "diarize/audio_player"
 require "diarize/super_vector"
 
 # Extenions to the {Ruby-Java Bridge}[http://rjb.rubyforge.org/] module that

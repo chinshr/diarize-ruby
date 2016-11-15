@@ -1,12 +1,10 @@
-require File.join(File.expand_path(File.dirname(__FILE__)), 'audio_player')
-
 require 'rubygems'
 require 'to_rdf'
 require 'uri'
 
 module Diarize
-
   class Segment
+    include ToRdf
 
     attr_reader :start, :duration, :gender, :bandwidth
 
@@ -23,20 +21,13 @@ module Diarize
       Speaker.find_or_create(URI("#{@audio.base_uri}##{@speaker_id}"), @speaker_gender)
     end
 
-    def play(options = {})
-      player = AudioPlayer.new
-      player.play(@audio.file, options.merge({:start => start, :duration => duration}))
-    end
-
-    include ToRdf
-
     def namespaces
       super.merge 'ws' => 'http://wsarchive.prototype0.net/ontology/'
     end
 
     def uri
       # http://www.w3.org/TR/media-frags/
-      URI("#{@audio.base_uri}#t=#{start},#{start+duration}")
+      URI("#{@audio.base_uri}#t=#{start},#{start + duration}")
     end
 
     def type_uri
@@ -52,7 +43,5 @@ module Diarize
         'ws:speaker' => speaker,
       }
     end
-
   end
-
 end

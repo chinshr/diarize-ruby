@@ -103,7 +103,7 @@ module Diarize
           gaussian = model.components.get(k)
           gaussian.dim.times do |i|
             normalized_mean = (1.0 / distance_to_ubm) * gaussian.mean(i) + (1.0 - 1.0 / distance_to_ubm)  * speaker_ubm.model.components.get(k).mean(i)
-            gaussian.set_mean(i, normalized_mean) 
+            gaussian.set_mean(i, normalized_mean)
           end
         end
         @normalized = true

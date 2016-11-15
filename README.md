@@ -41,11 +41,6 @@ identification.
 
     $ bundle install
 
-Note: To make audio playback work with [Audio Playback](https://github.com/arirusso/audio-playback), you should install the following native libraries (homebrew):
-
-    brew install libffi
-    brew install portaudio
-
 If you are using a different version of LIUM than what is bundled in the `bin` folder, you can do so by setting an environment variable.
 
     $ export DIARIZE_RUBY_RJB_LOAD_PATH=<path-to-LIUM-jar-file>
@@ -63,8 +58,6 @@ If you are using a different version of LIUM than what is bundled in the `bin` f
     > speakers.first.gender
     > speakers.first.model.mean_log_likelihood
     > speakers.first.model.components.size
-    > audio.segments_by_speaker(speakers.first)[0].play
-    > audio.segments_by_speaker(speakers.first)[1].play
     > ...
     > speakers ||= other_speakers
     > Diarize::Speaker.match(speakers)

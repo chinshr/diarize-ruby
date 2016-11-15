@@ -1,16 +1,15 @@
 module Diarize
-
   class Segmentation
 
     def self.from_seg_file(audio, seg_file)
       segmentation = []
       File.open(seg_file).each_line do |line|
         next if line.start_with? ';;'
-        parts = line.split(' ')
-        start = parts[2].to_i / 100.0
-        duration = parts[3].to_i / 100.0
-        gender = parts[4]
-        bandwidth = parts[6]
+        parts      = line.split(' ')
+        start      = parts[2].to_i / 100.0
+        duration   = parts[3].to_i / 100.0
+        gender     = parts[4]
+        bandwidth  = parts[6]
         speaker_id = parts[7]
         segmentation << Segment.new(audio, start, duration, gender, bandwidth, speaker_id)
       end
@@ -33,5 +32,4 @@ module Diarize
     end
 
   end
-
 end

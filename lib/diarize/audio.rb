@@ -182,9 +182,9 @@ module Diarize
       clustersSplitClust = diarization.speech("10,10,50", clusterSet, clustersSegInit, clustersDClust, featureSet, parameter)
       clusters = diarization.gender(clusterSet, clustersSplitClust, featureSet, parameter)
       if parameter.parameterDiarization.isCEClustering
-        # If true, the program computes the NCLR/CE clustering at the end. 
-        # The diarization error rate is minimized. 
-        # If this option is not set, the program stops right after the detection of the gender 
+        # If true, the program computes the NCLR/CE clustering at the end.
+        # The diarization error rate is minimized.
+        # If this option is not set, the program stops right after the detection of the gender
         # and the resulting segmentation is sufficient for a transcription system.
         clusters = diarization.speakerClustering(parameterDiarization.getThreshold("c"), "ce", clusterSet, clusters, featureSet, parameter)
       end
