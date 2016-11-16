@@ -45,19 +45,19 @@ From Ruby:
     $ diarize console
 
 ```ruby
-    audio = Diarize::Audio.new(URI.join('file:///', File.join(File.expand_path(File.dirname(__FILE__)), "test", "data", "will-and-juergen.wav")))
+audio = Diarize::Audio.new(URI.join('file:///', File.join(File.expand_path(File.dirname(__FILE__)), "test", "data", "will-and-juergen.wav")))
 
-    audio.analyze!
-    audio.segments
-    audio.speakers
-    audio.to_rdf
-    speakers = audio.speakers
-    speakers.first.gender
-    speakers.first.model.mean_log_likelihood
-    speakers.first.model.components.size
-    ...
-    speakers ||= other_speakers
-    Diarize::Speaker.match(speakers)
+audio.analyze!
+audio.segments
+audio.speakers
+audio.to_rdf
+speakers = audio.speakers
+speakers.first.gender
+speakers.first.model.mean_log_likelihood
+speakers.first.model.components.size
+...
+speakers ||= other_speakers
+Diarize::Speaker.match(speakers)
 ```
 
 From bash:
@@ -84,18 +84,18 @@ From bash:
 From Ruby:
 
 ```ruby
-    require "diarize"
-    require "drb/drb"
+require "diarize"
+require "drb/drb"
 
-    server_uri = "druby://localhost:9999"
-    DRb.start_service
-    client = DRbObject.new_with_uri(server_uri)
+server_uri = "druby://localhost:9999"
+DRb.start_service
+client = DRbObject.new_with_uri(server_uri)
 
-    audio_uri = URI.join('file:///', File.join(File.expand_path(File.dirname(__FILE__)), "test", "data", "will-and-juergen.wav"))
-    audio = client.new_audio(audio_uri)
-    audio.analyze!
-    audio.segments
-    ...
+audio_uri = URI.join('file:///', File.join(File.expand_path(File.dirname(__FILE__)), "test", "data", "will-and-juergen.wav"))
+audio = client.new_audio(audio_uri)
+audio.analyze!
+audio.segments
+...
 ```
 
 ## Running tests
