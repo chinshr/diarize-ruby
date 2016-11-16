@@ -35,7 +35,7 @@ def build_remote_audio_from_args(args, options = {})
   audio_uri = uri_from_args(args)
 
   $stdout.puts uri.to_s if options[:verbose]
-  audio = remote.new_audio(audio_uri)
+  audio = remote.build_audio(audio_uri)
   audio.analyze!
   audio
 rescue DRb::DRbConnError => ex

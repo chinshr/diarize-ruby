@@ -92,7 +92,7 @@ DRb.start_service
 client = DRbObject.new_with_uri(server_uri)
 
 audio_uri = URI.join('file:///', File.join(File.expand_path(File.dirname(__FILE__)), "test", "data", "will-and-juergen.wav"))
-audio = client.new_audio(audio_uri)
+audio = client.build_audio(audio_uri)
 audio.analyze!
 audio.segments
 ...

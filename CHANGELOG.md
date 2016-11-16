@@ -1,3 +1,7 @@
+## [v0.3.5] - 2016-11-16
+
+- Refactor server interface to build_audio
+
 ## [v0.3.4] - 2016-11-16
 
 - Add diarize binary
