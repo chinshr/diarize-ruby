@@ -47,9 +47,8 @@ If you are using a different version of LIUM than what is bundled in the `bin` f
 
 ## Examples
 
-    $ irb -I lib
-    > require "diarize"
-    > audio = Diarize::Audio.new URI.join('file:///', File.join(File.expand_path(File.dirname(__FILE__)), "test", "data", "will-and-juergen.wav"))
+    $ diarize console
+    > audio = Diarize::Audio.new(URI.join('file:///', File.join(File.expand_path(File.dirname(__FILE__)), "test", "data", "will-and-juergen.wav")))
     > audio.analyze!
     > audio.segments
     > audio.speakers
@@ -61,7 +60,6 @@ If you are using a different version of LIUM than what is bundled in the `bin` f
     > ...
     > speakers ||= other_speakers
     > Diarize::Speaker.match(speakers)
-
 
 ## Running tests
 

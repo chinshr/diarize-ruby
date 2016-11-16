@@ -1,5 +1,4 @@
 module Diarize
-
   class SuperVector
     attr_reader :vector
 
@@ -72,6 +71,5 @@ module Diarize
       @vector.hash
     end
 
-  end
-
+  end # SuperVector
 end

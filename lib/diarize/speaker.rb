@@ -1,15 +1,7 @@
-require 'rubygems'
-require 'to_rdf'
-# require 'jblas'
-
 module Diarize
-
   class Speaker
-
-    # include JBLAS
-
     @@log_likelihood_threshold = -33
-    @@detection_threshold = 0.2
+    @@detection_threshold      = 0.2
 
     @@speakers = {}
 
@@ -168,7 +160,5 @@ module Diarize
       Rjb::import('fr.lium.spkDiarization.libModel.ModelIO').writerGMMContainer(output, gmmlist.java_object)
       output.close
     end
-
-  end
-
+  end # Speaker
 end

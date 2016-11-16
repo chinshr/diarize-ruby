@@ -1,17 +1,5 @@
-require File.join(File.expand_path(File.dirname(__FILE__)), 'lium')
-require File.join(File.expand_path(File.dirname(__FILE__)), 'segmentation')
-require File.join(File.expand_path(File.dirname(__FILE__)), 'speaker')
-
-require 'rubygems'
-require 'to_rdf'
-require 'uri'
-require 'open-uri'
-require 'digest/md5'
-
 module Diarize
-
   class Audio
-
     attr_reader :path, :file, :uri
 
     def initialize(url_or_uri)
@@ -65,18 +53,18 @@ module Diarize
 
     def speakers
       return @speakers if @speakers
-      @speakers = segments.map { |segment| segment.speaker }.uniq
+      @speakers = segments.map {|segment| segment.speaker}.uniq
     end
 
     def segments_by_speaker(speaker)
-      segments.select { |segment| segment.speaker == speaker }
+      segments.select {|segment| segment.speaker == speaker}
     end
 
     def duration_by_speaker(speaker)
       return unless speaker
       segments = segments_by_speaker(speaker)
       duration = 0.0
-      segments.each { |segment| duration += segment.duration }
+      segments.each {|segment| duration += segment.duration}
       duration
     end
 
@@ -191,6 +179,5 @@ module Diarize
       Rjb::JavaObjectWrapper.new(clusters)
     end
 
-  end
-
+  end # Audio
 end

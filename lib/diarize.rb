@@ -6,12 +6,19 @@ RJB_OPTIONS   = ['-Xms16m', '-Xmx1024m']
 Rjb::load(RJB_LOAD_PATH, RJB_OPTIONS)
 
 require "matrix"
+
+require "to_rdf"
+require "uri"
+require "open-uri"
+require "digest/md5"
+
 require "diarize/version"
-require "diarize/lium"
 require "diarize/audio"
 require "diarize/segment"
+require "diarize/speaker"
 require "diarize/segmentation"
 require "diarize/super_vector"
+require "diarize/server"
 
 # Extenions to the {Ruby-Java Bridge}[http://rjb.rubyforge.org/] module that
 # adds a generic Java object wrapper class.
