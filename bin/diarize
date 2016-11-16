@@ -57,22 +57,10 @@ arguments :strict
 
 #-v, --verbose
 desc 'Print more verbose output'
-switch [:v, :verbose]
-
-#-H, --host HOSTNAME
-desc 'Host, e.g. "www.example.com"'
-default_value 'localhost'
-arg_name 'HOSTNAME'
-flag [:H, :host]
-
-#-P, --port PORT
-desc 'Port number'
-default_value 9999
-arg_name 'PORT'
-flag [:P, :port]
+switch [:verbose, :v]
 
 desc 'start console'
-command [:c, :console] do |console|
+command [:console, :c] do |console|
   console.action do |global_options, options, args|
     require 'irb'
 
@@ -81,7 +69,8 @@ command [:c, :console] do |console|
   end
 end
 
-command [:r, :remote] do |remote|
+desc 'use remote server'
+command [:remote, :r] do |remote|
   remote.command [:a, :audio] do |audio|
     audio.desc 'diarize remote audio segments FILENAME'
     audio.arg_name 'FILENAME', :multiple
@@ -107,7 +96,8 @@ command [:r, :remote] do |remote|
   end
 end
 
-command [:a, :audio] do |audio|
+desc 'audio file'
+command [:audio, :a] do |audio|
   audio.desc 'diarize audio segments FILENAME'
   audio.arg_name 'FILENAME', :multiple
   audio.command [:se, :segment, :segments] do |segments|
@@ -132,7 +122,7 @@ command [:a, :audio] do |audio|
 end
 
 desc 'start server'
-command [:s, :server] do |server|
+command [:server, :s] do |server|
   server.action do |global_options, options, args|
     merged_options = options.merge(global_options)
     argv = merged_options.reject {|k, v| !k.is_a?(String)}
@@ -141,41 +131,45 @@ command [:s, :server] do |server|
     argv = argv.to_a.flatten
 
     uri = "druby://#{merged_options[:host]}:#{merged_options[:port]}"
-    $stdout.puts "Drb server"
+    $stdout.puts "DRb server"
     $stdout.puts "diarize-ruby #{Diarize::VERSION}"
     $stdout.puts "Arguments: #{argv.inspect}" if global_options[:verbose]
+    if merged_options[:pidfile]
+      $stdout.puts "Pidfile '#{merged_options[:pidfile]}' (#{$$})"
+    end
     $stdout.puts "Listening on #{uri}, CTRL+C to stop"
     server = Diarize::Server.new
     DRb.start_service(uri, server)
     DRb.thread.join
   end
 
-  #-H, --host HOSTNAME
-  server.desc 'Host, e.g. "www.example.com"'
+  #-h, --host HOSTNAME
+  server.desc 'Host, e.g. "localhost"'
   server.default_value 'localhost'
   server.arg_name 'HOSTNAME'
-  server.flag [:H, :host]
+  server.flag [:h, :host]
 
-  #-P, --port PORT
+  #-p, --port PORT
   server.desc 'Port number'
   server.default_value 9999
   server.arg_name 'PORT'
-  server.flag [:P, :port]
+  server.flag [:p, :port]
+
+  #-P, --pidfile PIDFILE
+  server.desc 'PID file'
+  server.arg_name 'PIDFILE'
+  server.flag [:P, :pidfile]
 end
 
 pre do |global, command, options, args|
-  # Pre logic here
-  # Return true to proceed; false to abort and not call the
-  # chosen command
-  # Use skips_pre before a command to skip this block
-  # on that command only
+  if command.name == :server
+    File.write(options[:pidfile], $$) if options[:pidfile]
+  end
   true
 end
 
-post do |global,command,options,args|
-  # Post logic here
-  # Use skips_post before a command to skip this
-  # block on that command only
+post do |global, command, options, args|
+  true
 end
 
 on_error do |exception|
@@ -186,6 +180,6 @@ end
 
 begin
   exit run(ARGV)
-rescue
+rescue UncaughtThrowError
   $stdout.puts "Bye."
 end

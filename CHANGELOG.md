@@ -1,3 +1,8 @@
+## [v0.3.6] - 2016-11-16
+
+- Add pidfile option to diarize server command (--pidfile, -P)
+- Change diarize option port (--port, -p)
+
 ## [v0.3.5] - 2016-11-16
 
 - Refactor server interface to build_audio
