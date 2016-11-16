@@ -1,0 +1,191 @@
+#!/usr/bin/env ruby
+require "diarize"
+require "gli"
+require "uri"
+require "drb/drb"
+require "byebug"
+
+include GLI::App
+
+def uri_from_args(args)
+  url_or_file_name = args.first
+  uri = URI.parse(url_or_file_name)
+  if uri.scheme && uri.scheme.match(/^(http|https|file)$/)
+    uri = url_or_file_name
+  else
+    uri = if url_or_file_name[0] == "/"
+      URI.join('file:///', url_or_file_name)
+    else
+      URI.join('file:///', File.join(File.expand_path(Dir.pwd), url_or_file_name))
+    end
+  end
+  uri
+end
+
+def build_audio_from_args(args, options = {})
+  uri = uri_from_args(args)
+  $stdout.puts uri.to_s if options[:verbose]
+  audio = Diarize::Audio.new(uri)
+  audio.analyze!
+  audio
+end
+
+def build_remote_audio_from_args(args, options = {})
+  remote = client(options)
+  audio_uri = uri_from_args(args)
+
+  $stdout.puts uri.to_s if options[:verbose]
+  audio = remote.new_audio(audio_uri)
+  audio.analyze!
+  audio
+rescue DRb::DRbConnError => ex
+  $stdout.puts 'Connection error, start server with "diarize server"'
+end
+
+def client(options = {})
+  uri = "druby://#{options[:host]}:#{options[:port]}"
+  DRb.start_service
+  DRbObject.new_with_uri(uri)
+end
+
+program_desc 'Diarize is an easy-to-use toolkit for speaker segmentation.'
+
+version Diarize::VERSION
+
+subcommand_option_handling :normal
+arguments :strict
+
+#-v, --verbose
+desc 'Print more verbose output'
+switch [:v, :verbose]
+
+#-H, --host HOSTNAME
+desc 'Host, e.g. "www.example.com"'
+default_value 'localhost'
+arg_name 'HOSTNAME'
+flag [:H, :host]
+
+#-P, --port PORT
+desc 'Port number'
+default_value 9999
+arg_name 'PORT'
+flag [:P, :port]
+
+desc 'start console'
+command [:c, :console] do |console|
+  console.action do |global_options, options, args|
+    require 'irb'
+
+    ARGV.clear
+    IRB.start
+  end
+end
+
+command [:r, :remote] do |remote|
+  remote.command [:a, :audio] do |audio|
+    audio.desc 'diarize remote audio segments FILENAME'
+    audio.arg_name 'FILENAME', :multiple
+    audio.command [:se, :segment, :segments] do |segments|
+      segments.action do |global_options, options, args|
+        audio = build_remote_audio_from_args(args, options.merge(global_options))
+        audio.segments.each do |segment|
+          $stdout.puts segment.uri
+        end if audio
+      end
+    end
+
+    audio.desc 'diarize remote audio speakers FILENAME'
+    audio.arg_name 'FILENAME', :multiple
+    audio.command [:sp, :speaker, :speakers] do |speakers|
+      speakers.action do |global_options, options, args|
+        audio = build_remote_audio_from_args(args, options.merge(global_options))
+        audio.speakers.each do |speaker|
+          $stdout.puts speaker.uri
+        end if audio
+      end
+    end
+  end
+end
+
+command [:a, :audio] do |audio|
+  audio.desc 'diarize audio segments FILENAME'
+  audio.arg_name 'FILENAME', :multiple
+  audio.command [:se, :segment, :segments] do |segments|
+    segments.action do |global_options, options, args|
+      audio = build_audio_from_args(args, global_options)
+      audio.segments.each do |segment|
+        $stdout.puts segment.uri
+      end
+    end
+  end
+
+  audio.desc 'diarize audio speakers FILENAME'
+  audio.arg_name 'FILENAME', :multiple
+  audio.command [:sp, :speaker, :speakers] do |speakers|
+    speakers.action do |global_options, options, args|
+      audio = build_audio_from_args(args, global_options)
+      audio.speakers.each do |speaker|
+        $stdout.puts speaker.uri
+      end
+    end
+  end
+end
+
+desc 'start server'
+command [:s, :server] do |server|
+  server.action do |global_options, options, args|
+    merged_options = options.merge(global_options)
+    argv = merged_options.reject {|k, v| !k.is_a?(String)}
+    argv = argv.inject({}) {|r, h| r[h[0].length > 1 ? "--#{h[0]}" : "-#{h[0]}"] = h.last; r}
+    argv = argv.reject {|k, v| !v}
+    argv = argv.to_a.flatten
+
+    uri = "druby://#{merged_options[:host]}:#{merged_options[:port]}"
+    $stdout.puts "Drb server"
+    $stdout.puts "diarize-ruby #{Diarize::VERSION}"
+    $stdout.puts "Arguments: #{argv.inspect}" if global_options[:verbose]
+    $stdout.puts "Listening on #{uri}, CTRL+C to stop"
+    server = Diarize::Server.new
+    DRb.start_service(uri, server)
+    DRb.thread.join
+  end
+
+  #-H, --host HOSTNAME
+  server.desc 'Host, e.g. "www.example.com"'
+  server.default_value 'localhost'
+  server.arg_name 'HOSTNAME'
+  server.flag [:H, :host]
+
+  #-P, --port PORT
+  server.desc 'Port number'
+  server.default_value 9999
+  server.arg_name 'PORT'
+  server.flag [:P, :port]
+end
+
+pre do |global, command, options, args|
+  # Pre logic here
+  # Return true to proceed; false to abort and not call the
+  # chosen command
+  # Use skips_pre before a command to skip this block
+  # on that command only
+  true
+end
+
+post do |global,command,options,args|
+  # Post logic here
+  # Use skips_post before a command to skip this
+  # block on that command only
+end
+
+on_error do |exception|
+  # Error logic here
+  # return false to skip default error handling
+  true
+end
+
+begin
+  exit run(ARGV)
+rescue
+  $stdout.puts "Bye."
+end

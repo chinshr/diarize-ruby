@@ -1,7 +1,3 @@
-require 'rubygems'
-require 'to_rdf'
-require 'uri'
-
 module Diarize
   class Segment
     include ToRdf

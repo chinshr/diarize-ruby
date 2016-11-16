@@ -17,7 +17,7 @@ Gem::Specification.new do |spec|
 
   spec.files         = `git ls-files -z`.split("\x0")
   spec.bindir        = 'bin'
-  spec.executables   = []
+  spec.executables   = ["diarize"]
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
@@ -29,4 +29,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency "rjb", "~> 1.5"
   spec.add_dependency "to-rdf", "~> 0"
   spec.add_dependency "jblas-ruby", "~> 1.1"
+
+  spec.add_runtime_dependency('gli', '~> 2.13.0')
 end
