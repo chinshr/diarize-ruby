@@ -1,3 +1,8 @@
+## [v0.3.4] - 2016-11-16
+
+- Add diarize binary
+- DRb server
+
 ## [v0.3.3] - 2016-11-14
 
 - Remove require for audio-playback

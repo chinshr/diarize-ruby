@@ -1,17 +1,8 @@
 # diarize-ruby
 
-This library provides an easy-to-use toolkit for speaker segmentation (diarization) and identification from audio.
+This library provides an easy-to-use toolkit for speaker segmentation (diarization) and identification from audio. It was adopted from [diarize-jruby](https://github.com/bbc/diarize-jruby), being used within the BBC R&D World Service.
 
-This library was adopted from [diarize-jruby](https://github.com/bbc/diarize-jruby), being used within the BBC R&D World Service.
-
-The main reason from deviating from the original library is to have a universal gem that works with either Ruby interpreter. It uses [Ruby Java Bridge](http://rjb.rubyforge.org) instead of [JRuby](http://jruby.org).
-
-Work to be done:
-
-* Universal gem that works on JRuby and various Ruby implementations (MRI) and versions
-* Use performant math packages tuned to either Ruby implementation
-* Add support for alternative diarization tools
-* Add CI tool
+The main reason from deviating from the original is to provide support for Ruby MRI. It uses [Ruby Java Bridge](http://rjb.rubyforge.org) instead of [JRuby](http://jruby.org).
 
 ## Speaker Diarization
 
@@ -47,19 +38,65 @@ If you are using a different version of LIUM than what is bundled in the `bin` f
 
 ## Examples
 
+### Get Segments and Speakers
+
+From Ruby:
+
     $ diarize console
-    > audio = Diarize::Audio.new(URI.join('file:///', File.join(File.expand_path(File.dirname(__FILE__)), "test", "data", "will-and-juergen.wav")))
-    > audio.analyze!
-    > audio.segments
-    > audio.speakers
-    > audio.to_rdf
-    > speakers = audio.speakers
-    > speakers.first.gender
-    > speakers.first.model.mean_log_likelihood
-    > speakers.first.model.components.size
-    > ...
-    > speakers ||= other_speakers
-    > Diarize::Speaker.match(speakers)
+
+```ruby
+    audio = Diarize::Audio.new(URI.join('file:///', File.join(File.expand_path(File.dirname(__FILE__)), "test", "data", "will-and-juergen.wav")))
+
+    audio.analyze!
+    audio.segments
+    audio.speakers
+    audio.to_rdf
+    speakers = audio.speakers
+    speakers.first.gender
+    speakers.first.model.mean_log_likelihood
+    speakers.first.model.components.size
+    ...
+    speakers ||= other_speakers
+    Diarize::Speaker.match(speakers)
+```
+
+From bash:
+
+    $ diarize audio speaker example.wav
+
+### Start Server
+
+Some Java implementations (i.e. OpenJDK on Linux) are causing trouble running [Rjb](http://rjb.rubyforge.org) on threaded environments (e.g. [Celluloid](https://github.com/celluloid/celluloid), [Sidekick](https://github.com/mperham/sidekiq), [Shoryuken](https://github.com/phstc/shoryuken)) leading to instability. One workaround is to start diarize as server [DRb](http://ruby-doc.org/stdlib-2.0.0/libdoc/drb/rdoc/DRb.html) by a client proxy.
+
+Start the diarizer in a separate process as a server:
+
+    $ diarize server -P 9999 -H localhost
+    Drb server
+    diarize-ruby 0.3.4
+    Listening on druby://localhost:9999, CTRL+C to stop
+
+### Client
+
+From bash:
+
+    $ diarize remote audio segment example.wav
+
+From Ruby:
+
+```ruby
+    require "diarize"
+    require "drb/drb"
+
+    server_uri = "druby://localhost:9999"
+    DRb.start_service
+    client = DRbObject.new_with_uri(server_uri)
+
+    audio_uri = URI.join('file:///', File.join(File.expand_path(File.dirname(__FILE__)), "test", "data", "will-and-juergen.wav"))
+    audio = client.new_audio(audio_uri)
+    audio.analyze!
+    audio.segments
+    ...
+```
 
 ## Running tests
 
@@ -100,6 +137,13 @@ This library includes a binary JAR file from the LIUM project, which code
 is licensed under the GNU General Public License version 2. See
 http://lium3.univ-lemans.fr/diarization/doku.php/licence for more
 information.
+
+## TODOs
+
+* Universal gem that works on JRuby and various Ruby implementations (MRI) and versions
+* Use performant math packages tuned to either Ruby implementation
+* Add support for alternative diarization tools
+* Add CI tool
 
 ## Developer Resources
 
