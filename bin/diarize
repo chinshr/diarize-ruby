@@ -3,39 +3,21 @@ require "diarize"
 require "gli"
 require "uri"
 require "drb/drb"
-require "byebug"
 
 include GLI::App
 
-def uri_from_args(args)
-  url_or_file_name = args.first
-  uri = URI.parse(url_or_file_name)
-  if uri.scheme && uri.scheme.match(/^(http|https|file)$/)
-    uri = url_or_file_name
-  else
-    uri = if url_or_file_name[0] == "/"
-      URI.join('file:///', url_or_file_name)
-    else
-      URI.join('file:///', File.join(File.expand_path(Dir.pwd), url_or_file_name))
-    end
-  end
-  uri
-end
-
 def build_audio_from_args(args, options = {})
-  uri = uri_from_args(args)
-  $stdout.puts uri.to_s if options[:verbose]
-  audio = Diarize::Audio.new(uri)
+  $stdout.puts args.first.to_s if options[:verbose]
+  audio = Diarize::Audio.new(args.first)
   audio.analyze!
   audio
 end
 
 def build_remote_audio_from_args(args, options = {})
   remote = client(options)
-  audio_uri = uri_from_args(args)
 
-  $stdout.puts uri.to_s if options[:verbose]
-  audio = remote.build_audio(audio_uri)
+  $stdout.puts args.first.to_s if options[:verbose]
+  audio = remote.build_audio(args.first)
   audio.analyze!
   audio
 rescue DRb::DRbConnError => ex
@@ -76,7 +58,7 @@ command [:remote, :r] do |remote|
     audio.arg_name 'FILENAME', :multiple
     audio.command [:se, :segment, :segments] do |segments|
       segments.action do |global_options, options, args|
-        audio = build_remote_audio_from_args(args, options.merge(global_options))
+        audio = build_remote_audio_from_args(args, options.first.last.first.last)
         audio.segments.each do |segment|
           $stdout.puts segment.uri
         end if audio
@@ -87,13 +69,25 @@ command [:remote, :r] do |remote|
     audio.arg_name 'FILENAME', :multiple
     audio.command [:sp, :speaker, :speakers] do |speakers|
       speakers.action do |global_options, options, args|
-        audio = build_remote_audio_from_args(args, options.merge(global_options))
+        audio = build_remote_audio_from_args(args, options.first.last.first.last)
         audio.speakers.each do |speaker|
           $stdout.puts speaker.uri
         end if audio
       end
     end
   end
+
+  #-h, --host HOSTNAME
+  remote.desc 'Host, e.g. "localhost"'
+  remote.default_value 'localhost'
+  remote.arg_name 'HOSTNAME'
+  remote.flag [:h, :host]
+
+  #-p, --port PORT
+  remote.desc 'Port number'
+  remote.default_value 9999
+  remote.arg_name 'PORT'
+  remote.flag [:p, :port]
 end
 
 desc 'audio file'

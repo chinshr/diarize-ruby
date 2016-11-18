@@ -2,22 +2,30 @@ module Diarize
   class Audio
     attr_reader :path, :file, :uri
 
-    def initialize(url_or_uri)
-      @uri = url_or_uri.is_a?(String) ? URI(url_or_uri) : url_or_uri
-      if uri.scheme == 'file'
-        # Local file
+    def initialize(uri_url_or_file_name)
+      if uri_url_or_file_name.is_a?(URI)
+        @uri = uri_url_or_file_name
+      elsif uri_url_or_file_name.is_a?(String)
+        # url or file name
+        @uri = URI.parse(uri_url_or_file_name)
+        if @uri.scheme && @uri.scheme.match(/^(http|https|file)$/)
+          # url or file:/// uri, do nothing
+        else
+          @uri = URI.join('file:///', File.join(File.expand_path(uri_url_or_file_name)))
+        end
+      end
+
+      if @uri.scheme == 'file'
         @path = uri.path
       else
-        # Remote file, we get it locally
-        @path = '/tmp/' + Digest::MD5.hexdigest(uri.to_s)
-        File.open(@path, "wb") {|f| f << open(uri).read }
+        # remote file, we download it locally
+        @path = '/tmp/' + Digest::MD5.hexdigest(@uri.to_s)
+        File.open(@path, "wb") {|f| f << open(@uri, {ssl_verify_mode: OpenSSL::SSL::VERIFY_NONE}).read}
       end
 
-      if !File.exist?(@path)
-        raise "Unable to locate: #{@path}.  Check that the file is available at #{uri.inspect}."
-      end
+      raise "Unable to locate '#{@path}' from '#{@uri.inspect}'." unless File.exist?(@path)
 
-      @file = File.new @path
+      @file = File.new(@path)
     end
 
     def analyze!(train_speaker_models = true)
@@ -37,7 +45,7 @@ module Diarize
       #parameter.parameterDiarization.cEClustering = true # We use CE clustering by default
       parameter.parameterInputFeature.setFeatureMask(@path)
       @clusters = ester2(parameter)
-      @segments = Segmentation.from_clusters(self, @clusters)
+      @segments = Segmentation.from_clusters(self, @clusters).sort_by(&:start)
       train_speaker_gmms if train_speaker_models
     end
 
@@ -47,7 +55,7 @@ module Diarize
     end
 
     def segments
-      raise Exception.new('You need to run analyze! before being able to access the analysis results') unless @segments
+      raise RuntimeError, "You need to run analyze! before being able to access the analysis results" unless @segments
       @segments
     end
 

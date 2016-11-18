@@ -71,8 +71,8 @@ Some Java implementations (i.e. OpenJDK on Linux) are causing trouble running [R
 Start the diarizer in a separate process as a server:
 
     $ diarize server -P 9999 -H localhost
-    Drb server
-    diarize-ruby 0.3.4
+    DRb server
+    diarize-ruby x.y.z
     Listening on druby://localhost:9999, CTRL+C to stop
 
 ### Client
@@ -91,8 +91,7 @@ server_uri = "druby://localhost:9999"
 DRb.start_service
 client = DRbObject.new_with_uri(server_uri)
 
-audio_uri = URI.join('file:///', File.join(File.expand_path(File.dirname(__FILE__)), "test", "data", "will-and-juergen.wav"))
-audio = client.build_audio(audio_uri)
+audio = client.build_audio(File.join("test", "data", "will-and-juergen.wav"))
 audio.analyze!
 audio.segments
 ...

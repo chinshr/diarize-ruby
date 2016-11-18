@@ -5,12 +5,12 @@ module Diarize
       segmentation = []
       File.open(seg_file).each_line do |line|
         next if line.start_with? ';;'
-        parts      = line.split(' ')
-        start      = parts[2].to_i / 100.0
-        duration   = parts[3].to_i / 100.0
-        gender     = parts[4]
-        bandwidth  = parts[6]
-        speaker_id = parts[7]
+        parts        = line.split(' ')
+        start        = parts[2].to_i / 100.0
+        duration     = parts[3].to_i / 100.0
+        gender       = parts[4]
+        bandwidth    = parts[6]
+        speaker_id   = parts[7]
         segmentation << Segment.new(audio, start, duration, gender, bandwidth, speaker_id)
       end
       segmentation
@@ -19,9 +19,9 @@ module Diarize
     def self.from_clusters(audio, clusters)
       segmentation = []
       clusters.map(&:to_s).each do |speaker_id|
-        cluster = clusters.getCluster(speaker_id)
-        gender = cluster.gender
-        bandwidth = cluster.bandwidth
+        cluster        = clusters.getCluster(speaker_id)
+        gender         = cluster.gender
+        bandwidth      = cluster.bandwidth
         cluster.each do |segment|
           start        = segment.start_in_second
           duration     = segment.length_in_second

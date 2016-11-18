@@ -43,8 +43,8 @@ class AudioTest < Test::Unit::TestCase
     audio.clean!
   end
 
-  def test_segments_raises_exception_when_audio_is_not_analysed
-    assert_raise Exception do
+  def test_segments_raises_exception_when_audio_is_not_analyzed
+    assert_raise RuntimeError do
       @audio.segments
     end
   end

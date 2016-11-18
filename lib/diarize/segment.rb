@@ -5,11 +5,11 @@ module Diarize
     attr_reader :start, :duration, :gender, :bandwidth
 
     def initialize(audio, start, duration, gender, bandwidth, speaker_id)
-      @audio = audio
-      @start = start
-      @duration = duration
-      @bandwidth = bandwidth
-      @speaker_id = speaker_id
+      @audio          = audio
+      @start          = start
+      @duration       = duration
+      @bandwidth      = bandwidth
+      @speaker_id     = speaker_id
       @speaker_gender = gender
     end
 
