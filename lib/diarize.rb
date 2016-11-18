@@ -7,10 +7,10 @@ Rjb::load(RJB_LOAD_PATH, RJB_OPTIONS)
 
 require "matrix"
 
-require "to_rdf"
 require "uri"
 require "open-uri"
 require "digest/md5"
+require "to_rdf"
 
 require "diarize/version"
 require "diarize/audio"

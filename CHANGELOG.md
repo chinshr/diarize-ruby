@@ -1,3 +1,10 @@
+## [v0.3.7] - 2016-11-18
+
+- Sort segments by start time by default
+- Allow to pass audio file names to `Diarize::Audio.new("~/foo.wav")`
+- Download https URLs without certs checking
+- Fix `diarize` druby uri for remote audio
+
 ## [v0.3.6] - 2016-11-16
 
 - Add pidfile option to diarize server command (--pidfile, -P)
