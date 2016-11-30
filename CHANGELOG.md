@@ -1,3 +1,13 @@
+## [v0.3.11] - 2016-11-30
+
+- Add `Segment#as_json` and `Segment#to_json`
+- Raise error when saving normalized model without force=true
+
+## [v0.3.10] - 2016-11-30
+
+- Remove `SuperVector#sha`
+- SuperVector initialize from arrays
+
 ## [v0.3.9] - 2016-11-29
 
 - Segment instances return speaker_id

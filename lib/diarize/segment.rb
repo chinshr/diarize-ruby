@@ -34,10 +34,26 @@ module Diarize
       {
         'ws:start' => start,
         'ws:duration' => duration,
-        'ws:gender' => gender,
+        'ws:gender' => speaker_gender,
         'ws:bandwidth' => bandwidth,
         'ws:speaker' => speaker,
       }
+    end
+
+    def as_json
+      {
+        'start' => start,
+        'duration' => duration,
+        'gender' => speaker_gender,
+        'bandwidth' => bandwidth,
+        'speaker_id' => speaker_id
+      }.tap {|s|
+        s['speaker'] = speaker.as_json if speaker
+      }
+    end
+
+    def to_json
+      as_json.to_json
     end
   end
 end
