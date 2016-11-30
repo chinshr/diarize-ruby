@@ -2,15 +2,15 @@ module Diarize
   class Segment
     include ToRdf
 
-    attr_reader :start, :duration, :gender, :bandwidth
+    attr_reader :start, :duration, :speaker_gender, :bandwidth, :speaker_id
 
-    def initialize(audio, start, duration, gender, bandwidth, speaker_id)
+    def initialize(audio, start, duration, speaker_gender, bandwidth, speaker_id)
       @audio          = audio
       @start          = start
       @duration       = duration
       @bandwidth      = bandwidth
       @speaker_id     = speaker_id
-      @speaker_gender = gender
+      @speaker_gender = speaker_gender
     end
 
     def speaker
@@ -18,7 +18,7 @@ module Diarize
     end
 
     def namespaces
-      super.merge 'ws' => 'http://wsarchive.prototype0.net/ontology/'
+      super.merge({'ws' => 'http://wsarchive.prototype0.net/ontology/'})
     end
 
     def uri
