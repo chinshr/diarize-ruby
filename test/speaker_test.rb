@@ -53,10 +53,40 @@ class SpeakerTest < Test::Unit::TestCase
   def test_save_and_load_model
     speaker = Diarize::Speaker.ubm
     tmp = Tempfile.new(['diarize-test', '.gmm'])
-    speaker.save_model(tmp.path)
+    speaker.save_model(tmp.path, true)
     model = Diarize::Speaker.load_model(tmp.path)
     assert_equal speaker.model.components.get(0).mean(0), model.components.get(0).mean(0)
     File.delete(tmp.path)
+  end
+
+  def test_should_raise_error_when_saving_normalized_model_without_force
+    speaker = Diarize::Speaker.new(nil, nil, File.join(File.dirname(__FILE__), 'data', 'speaker1.gmm'))
+    tmp = Tempfile.new(['diarize-test', '.gmm'])
+
+    # not normalized, forced false
+    assert_nothing_raised {
+      speaker.save_model(tmp.path)
+      File.delete(tmp.path)
+    }
+
+    # not normalized, forced true
+    assert_nothing_raised {
+      speaker.save_model(tmp.path, true)
+      File.delete(tmp.path)
+    }
+
+    # normalized, forced false
+    assert_raise {
+      speaker.normalize!
+      speaker.save_model(tmp.path, false)
+    }
+
+    # normalized, forced true
+    assert_nothing_raised {
+      speaker.normalize!
+      speaker.save_model(tmp.path, true)
+      File.delete(tmp.path)
+    }
   end
 
   def test_divergence_returns_nil_if_one_model_is_empty

@@ -94,8 +94,8 @@ module Diarize
       @mean_log_likelihood = mll
     end
 
-    def save_model(filename)
-      # TODO perhaps a warning if a normalized model is being saved?
+    def save_model(filename, force = false)
+      raise RuntimeError, "normalized model must be saved with force=true" if !force && normalized?
       write_gmm(filename, @model)
     end
 
