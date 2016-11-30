@@ -15,16 +15,24 @@ class SuperVectorTest < Test::Unit::TestCase
     end
   end
 
+  def test_initialize_from_supervector
+    model = Diarize::Speaker.load_model(File.join(File.dirname(__FILE__), 'data', 'speaker1.gmm'))
+    sv1 = Diarize::SuperVector.generate_from_model(model)
+    sv2 = Diarize::SuperVector.new(sv1)
+    assert_equal sv1.hash, sv2.hash
+  end
+
+  def test_initialize_from_array
+    model = Diarize::Speaker.load_model(File.join(File.dirname(__FILE__), 'data', 'speaker1.gmm'))
+    sv1 = Diarize::SuperVector.generate_from_model(model)
+    sv2 = Diarize::SuperVector.new(sv1.to_a)
+    assert_equal sv1.hash, sv2.hash
+  end
+
   def test_hash
     model = Diarize::Speaker.load_model(File.join(File.dirname(__FILE__), 'data', 'speaker1.gmm'))
     sv = Diarize::SuperVector.generate_from_model(model)
     assert_equal sv.vector.hash, sv.hash
-  end
-
-  def test_sha
-    model = Diarize::Speaker.load_model(File.join(File.dirname(__FILE__), 'data', 'speaker1.gmm'))
-    sv = Diarize::SuperVector.generate_from_model(model)
-    assert_equal Digest::SHA256.hexdigest(sv.hash.to_s), sv.sha
   end
 
   def test_to_a

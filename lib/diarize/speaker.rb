@@ -159,8 +159,7 @@ module Diarize
         'ws:gender' => gender,
         'ws:model' => model_uri,
         'ws:mean_log_likelihood' => mean_log_likelihood,
-        'ws:supervector_hash' => supervector.hash.to_s,
-        'ws:sha' => supervector.sha
+        'ws:supervector_hash' => supervector.hash.to_s
       }
     end
 
@@ -169,8 +168,7 @@ module Diarize
         'gender' => gender,
         'model' => model_uri,
         'mean_log_likelihood' => mean_log_likelihood,
-        'supervector_hash' => supervector.hash.to_s,
-        'sha' => supervector.sha
+        'supervector_hash' => supervector.hash.to_s
       }
     end
 
