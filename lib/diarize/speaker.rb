@@ -1,26 +1,90 @@
 module Diarize
   class Speaker
+    include ToRdf
+
     @@log_likelihood_threshold = -33
     @@detection_threshold      = 0.2
+    @@speakers                 = {}
 
-    @@speakers = {}
-
-    attr_accessor :model_uri, :model, :normalized
+    attr_accessor :model_uri, :model
     attr_reader :gender
+    attr_writer :normalized
 
     def initialize(uri = nil, gender = nil, model_file = nil)
-      @model = Speaker.load_model(model_file) if model_file
-      @uri = uri
-      @gender = gender
+      @model      = Speaker.load_model(model_file) if model_file
+      @uri        = uri
+      @gender     = gender
       @normalized = false
     end
 
-    def self.ubm
-      speaker = Speaker.new
-      speaker.normalized = true
-      speaker.model = Speaker.load_model(File.join(File.expand_path(File.dirname(__FILE__)), 'ubm.gmm'))
-      speaker
-    end
+    class << self
+
+      def ubm
+        speaker = Speaker.new
+        speaker.normalized = true
+        speaker.model = Speaker.load_model(File.join(File.expand_path(File.dirname(__FILE__)), 'ubm.gmm'))
+        speaker
+      end
+
+      def detection_threshold=(threshold)
+        @@detection_threshold = threshold
+      end
+
+      def detection_threshold
+        @@detection_threshold
+      end
+
+      def load_model(filename)
+        read_gmm(filename)
+      end
+
+      def find_or_create(uri, gender)
+        return @@speakers[uri] if @@speakers[uri]
+        @@speakers[uri] = Speaker.new(uri, gender)
+      end
+
+      def divergence(speaker1, speaker2)
+        # TODO bundle in mean_log_likelihood to weight down unlikely models?
+        return unless speaker1.model and speaker2.model
+        # MAP Gaussian divergence
+        # See "A model space framework for efficient speaker detection", Interspeech'05
+        divergence_lium(speaker1, speaker2)
+      end
+
+      def divergence_lium(speaker1, speaker2)
+        Rjb::import('fr.lium.spkDiarization.libModel.Distance').GDMAP(speaker1.model, speaker2.model)
+      end
+
+      def divergence_ruby(speaker1, speaker2)
+        SuperVector.divergence(speaker1.supervector, speaker2.supervector)
+      end
+
+      def match_sets(speakers1, speakers2)
+        matches = []
+        speakers1.each do |s1|
+          speakers2.each do |s2|
+            matches << [ s1, s2 ] if s1.same_speaker_as(s2)
+          end
+        end
+        matches
+      end
+
+      def match(speakers)
+        speakers.combination(2).select { |s1, s2| s1.same_speaker_as(s2) }
+      end
+
+      protected
+
+      def read_gmm(filename)
+        gmmlist = Rjb::JavaObjectWrapper.new("java.util.ArrayList")
+        input = Rjb::import('fr.lium.spkDiarization.lib.IOFile').new(filename, 'rb')
+        input.open
+        Rjb::import('fr.lium.spkDiarization.libModel.ModelIO').readerGMMContainer(input, gmmlist.java_object)
+        input.close
+        gmmlist.to_a.first.java_object
+      end
+
+    end # class
 
     def mean_log_likelihood
       @mean_log_likelihood ? @mean_log_likelihood : model.mean_log_likelihood # Will be NaN if model was loaded from somewhere
@@ -31,60 +95,16 @@ module Diarize
     end
 
     def save_model(filename)
-      # TODO perhaps a warning if a normalised model is being saved?
+      # TODO perhaps a warning if a normalized model is being saved?
       write_gmm(filename, @model)
     end
 
-    def self.detection_threshold=(threshold)
-      @@detection_threshold = threshold
-    end
-
-    def self.detection_threshold
-      @@detection_threshold
-    end
-
-    def self.load_model(filename)
-      read_gmm(filename)
-    end
-
-    def self.find_or_create(uri, gender)
-      return @@speakers[uri] if @@speakers[uri]
-      @@speakers[uri] = Speaker.new(uri, gender)
-    end
-
-    def self.divergence(speaker1, speaker2)
-      # TODO bundle in mean_log_likelihood to weight down unlikely models?
-      return unless speaker1.model and speaker2.model
-      # MAP Gaussian divergence
-      # See "A model space framework for efficient speaker detection", Interspeech'05
-      divergence_lium(speaker1, speaker2)
-    end
-
-    def self.divergence_lium(speaker1, speaker2)
-      # fr.lium.spkDiarization.libModel.Distance.GDMAP(speaker1.model, speaker2.model)
-      Rjb::import('fr.lium.spkDiarization.libModel.Distance').GDMAP(speaker1.model, speaker2.model)
-    end
-
-    def self.divergence_ruby(speaker1, speaker2)
-      SuperVector.divergence(speaker1.supervector, speaker2.supervector)
-    end
-
-    def self.match_sets(speakers1, speakers2)
-      matches = []
-      speakers1.each do |s1|
-        speakers2.each do |s2|
-          matches << [ s1, s2 ] if s1.same_speaker_as(s2)
-        end
-      end
-      matches
-    end
-
-    def self.match(speakers)
-      speakers.combination(2).select { |s1, s2| s1.same_speaker_as(s2) }
+    def normalized?
+      !!@normalized
     end
 
     def normalize!
-      unless @normalized
+      unless normalized?
         # Applies M-Norm from "D-MAP: a Distance-Normalized MAP Estimation of Speaker Models for Automatic Speaker Verification"
         # to the associated GMM, placing it on a unit hyper-sphere with a UBM centre (model will be at distance one from the UBM
         # according to GDMAP)
@@ -113,11 +133,14 @@ module Diarize
     end
 
     def supervector
-      # TODO: cache only when normalized
-      @supervector ||= SuperVector.generate_from_model(model)
+      if normalized?
+        @supervector ||= begin
+          SuperVector.generate_from_model(model)
+        end
+      else
+        SuperVector.generate_from_model(model)
+      end
     end
-
-    include ToRdf
 
     def namespaces
       super.merge 'ws' => 'http://wsarchive.prototype0.net/ontology/'
@@ -132,22 +155,30 @@ module Diarize
     end
 
     def rdf_mapping
-      { 'ws:gender' => gender, 'ws:model' => model_uri, 'ws:mean_log_likelihood' => model.mean_log_likelihood, 'ws:supervector_hash' => supervector.hash.to_s }
+      {
+        'ws:gender' => gender,
+        'ws:model' => model_uri,
+        'ws:mean_log_likelihood' => mean_log_likelihood,
+        'ws:supervector_hash' => supervector.hash.to_s,
+        'ws:supervector_sha' => supervector.sha
+      }
+    end
+
+    def as_json
+      {
+        'gender' => gender,
+        'model' => model_uri,
+        'mean_log_likelihood' => mean_log_likelihood,
+        'supervector_hash' => supervector.hash.to_s,
+        'supervector_sha' => supervector.sha
+      }
+    end
+
+    def to_json
+      as_json.to_json
     end
 
     protected
-
-    def self.read_gmm(filename)
-      # gmmlist = java.util.ArrayList.new
-      gmmlist = Rjb::JavaObjectWrapper.new("java.util.ArrayList")
-      # input = fr.lium.spkDiarization.lib.IOFile.new(filename, 'rb')
-      input = Rjb::import('fr.lium.spkDiarization.lib.IOFile').new(filename, 'rb')
-      input.open
-      # fr.lium.spkDiarization.libModel.ModelIO.readerGMMContainer(input, gmmlist)
-      Rjb::import('fr.lium.spkDiarization.libModel.ModelIO').readerGMMContainer(input, gmmlist.java_object)
-      input.close
-      gmmlist.to_a.first.java_object
-    end
 
     def write_gmm(filename, model)
       # gmmlist = java.util.ArrayList.new
@@ -160,5 +191,6 @@ module Diarize
       Rjb::import('fr.lium.spkDiarization.libModel.ModelIO').writerGMMContainer(output, gmmlist.java_object)
       output.close
     end
+
   end # Speaker
 end
