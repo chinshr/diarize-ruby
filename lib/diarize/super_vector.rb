@@ -71,5 +71,13 @@ module Diarize
       @vector.hash
     end
 
+    def sha
+      Digest::SHA256.hexdigest(hash.to_s)
+    end
+
+    def to_a
+      @vector.to_a
+    end
+
   end # SuperVector
 end

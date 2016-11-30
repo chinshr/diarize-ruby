@@ -2,6 +2,9 @@ require 'test_helper'
 require 'tempfile'
 
 class SpeakerTest < Test::Unit::TestCase
+  def setup
+    @model_file = File.join(File.dirname(__FILE__), 'data', 'speaker1.gmm')
+  end
 
   def test_detection_threshold
     Diarize::Speaker.detection_threshold = 0.1
@@ -28,8 +31,7 @@ class SpeakerTest < Test::Unit::TestCase
   end
 
   def test_initialize_with_model
-    model_file = File.join(File.dirname(__FILE__), 'data', 'speaker1.gmm')
-    speaker = Diarize::Speaker.new(nil, nil, model_file)
+    speaker = Diarize::Speaker.new(nil, nil, @model_file)
     assert_equal speaker.model.name, 'S0'
   end
 
@@ -66,8 +68,7 @@ class SpeakerTest < Test::Unit::TestCase
   end
 
   def test_divergence_is_symmetric
-    model_file = File.join(File.dirname(__FILE__), 'data', 'speaker1.gmm')
-    speaker1 = Diarize::Speaker.new(nil, nil, model_file)
+    speaker1 = Diarize::Speaker.new(nil, nil, @model_file)
     speaker2 = Diarize::Speaker.ubm
     assert Diarize::Speaker.divergence(speaker1, speaker2) > 0
     assert_equal Diarize::Speaker.divergence(speaker1, speaker2), Diarize::Speaker.divergence(speaker2, speaker1)
@@ -75,16 +76,14 @@ class SpeakerTest < Test::Unit::TestCase
   end
 
   def test_divergence_ruby_is_same_as_divergence_lium
-    model_file = File.join(File.dirname(__FILE__), 'data', 'speaker1.gmm')
-    speaker1 = Diarize::Speaker.new(nil, nil, model_file)
+    speaker1 = Diarize::Speaker.new(nil, nil, @model_file)
     speaker2 = Diarize::Speaker.ubm
     assert_equal Diarize::Speaker.divergence_lium(speaker1, speaker2).round(12), Diarize::Speaker.divergence_ruby(speaker1, speaker2).round(12)
   end
 
-  def test_normalise
+  def test_normalize
     # Testing M-Norm
-    model_file = File.join(File.dirname(__FILE__), 'data', 'speaker1.gmm')
-    speaker1 = Diarize::Speaker.new(nil, nil, model_file)
+    speaker1 = Diarize::Speaker.new(nil, nil, @model_file)
     speaker2 = Diarize::Speaker.ubm
     assert Diarize::Speaker.divergence(speaker1, speaker2) != 1.0
     speaker1.normalize! # Putting speaker1.gmm at distance 1 from UBM
@@ -98,4 +97,38 @@ class SpeakerTest < Test::Unit::TestCase
     assert_equal old_supervector, speaker.supervector
   end
 
+  def test_to_rdf
+    speaker = Diarize::Speaker.new(URI.parse(""), "F", @model_file)
+    speaker.model_uri = URI.parse("https://www.example.com/model/1")
+    speaker.mean_log_likelihood = 0.9
+    to_rdf = speaker.to_rdf
+    assert_equal true, to_rdf.include?("ws:gender")
+    assert_equal true, to_rdf.include?("ws:model")
+    assert_equal true, to_rdf.include?("ws:mean_log_likelihood")
+    assert_equal true, to_rdf.include?("ws:supervector_hash")
+    assert_equal true, to_rdf.include?("https://www.example.com/model/1")
+  end
+
+  def test_as_json
+    speaker = Diarize::Speaker.new(URI.parse(""), "F", @model_file)
+    speaker.mean_log_likelihood = 0.9
+    as_json = speaker.as_json
+    assert_equal true, as_json.has_key?('gender')
+    assert_equal true, as_json.has_key?('model')
+    assert_equal true, as_json.has_key?('mean_log_likelihood')
+    assert_equal true, as_json.has_key?('supervector_hash')
+    assert_equal true, as_json.has_key?('supervector_sha')
+  end
+
+  def test_to_json
+    speaker    = Diarize::Speaker.new(URI.parse(""), "F", @model_file)
+    speaker.mean_log_likelihood = 0.9
+    to_json    = speaker.to_json
+    as_json    = JSON.parse(to_json)
+    assert_equal true, as_json.has_key?('gender')
+    assert_equal true, as_json.has_key?('model')
+    assert_equal true, as_json.has_key?('mean_log_likelihood')
+    assert_equal true, as_json.has_key?('supervector_hash')
+    assert_equal true, as_json.has_key?('supervector_sha')
+  end
 end

@@ -1,3 +1,11 @@
+## [v0.3.8] - 2016-11-29
+
+- Speaker#load_model to return Java object instead of Rjb wrapper
+- Added sha to SuperVector
+- Added `as_json`/`to_json` for speakers
+- `to_rdf`, `as_json` and `to_json` to return supervector_sha for speaker identification
+- Refactored Rjb wrapper into separate folder
+
 ## [v0.3.7] - 2016-11-18
 
 - Sort segments by start time by default

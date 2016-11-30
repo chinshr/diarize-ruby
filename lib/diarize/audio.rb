@@ -155,7 +155,7 @@ module Diarize
 
       # Populating the speakers with their GMMs
       gmm_vect.each_with_index do |speaker_model, i|
-        speakers[i].model = speaker_model
+        speakers[i].model = speaker_model.java_object
       end
     end
 

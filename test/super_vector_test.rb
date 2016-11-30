@@ -21,4 +21,16 @@ class SuperVectorTest < Test::Unit::TestCase
     assert_equal sv.vector.hash, sv.hash
   end
 
+  def test_sha
+    model = Diarize::Speaker.load_model(File.join(File.dirname(__FILE__), 'data', 'speaker1.gmm'))
+    sv = Diarize::SuperVector.generate_from_model(model)
+    assert_equal Digest::SHA256.hexdigest(sv.hash.to_s), sv.sha
+  end
+
+  def test_to_a
+    model = Diarize::Speaker.load_model(File.join(File.dirname(__FILE__), 'data', 'speaker1.gmm'))
+    sv = Diarize::SuperVector.generate_from_model(model)
+    assert_equal sv.instance_variable_get("@vector").to_a, sv.to_a
+  end
+
 end
