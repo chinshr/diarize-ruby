@@ -1,3 +1,7 @@
+## [v0.3.9] - 2016-11-29
+
+- Segment instances return speaker_id
+
 ## [v0.3.8] - 2016-11-29
 
 - Speaker#load_model to return Java object instead of Rjb wrapper

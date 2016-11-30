@@ -160,7 +160,7 @@ module Diarize
         'ws:model' => model_uri,
         'ws:mean_log_likelihood' => mean_log_likelihood,
         'ws:supervector_hash' => supervector.hash.to_s,
-        'ws:supervector_sha' => supervector.sha
+        'ws:sha' => supervector.sha
       }
     end
 
@@ -170,7 +170,7 @@ module Diarize
         'model' => model_uri,
         'mean_log_likelihood' => mean_log_likelihood,
         'supervector_hash' => supervector.hash.to_s,
-        'supervector_sha' => supervector.sha
+        'sha' => supervector.sha
       }
     end
 
@@ -181,11 +181,8 @@ module Diarize
     protected
 
     def write_gmm(filename, model)
-      # gmmlist = java.util.ArrayList.new
       gmmlist = Rjb::JavaObjectWrapper.new("java.util.ArrayList")
-      # gmmlist << model.components
       gmmlist.java_object.add(model)
-      # output = fr.lium.spkDiarization.lib.IOFile.new(filename, 'wb')
       output = Rjb::import('fr.lium.spkDiarization.lib.IOFile').new(filename, 'wb')
       output.open
       Rjb::import('fr.lium.spkDiarization.libModel.ModelIO').writerGMMContainer(output, gmmlist.java_object)

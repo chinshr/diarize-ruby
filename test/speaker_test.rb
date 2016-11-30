@@ -106,6 +106,7 @@ class SpeakerTest < Test::Unit::TestCase
     assert_equal true, to_rdf.include?("ws:model")
     assert_equal true, to_rdf.include?("ws:mean_log_likelihood")
     assert_equal true, to_rdf.include?("ws:supervector_hash")
+    assert_equal true, to_rdf.include?("ws:sha")
     assert_equal true, to_rdf.include?("https://www.example.com/model/1")
   end
 
@@ -117,7 +118,7 @@ class SpeakerTest < Test::Unit::TestCase
     assert_equal true, as_json.has_key?('model')
     assert_equal true, as_json.has_key?('mean_log_likelihood')
     assert_equal true, as_json.has_key?('supervector_hash')
-    assert_equal true, as_json.has_key?('supervector_sha')
+    assert_equal true, as_json.has_key?('sha')
   end
 
   def test_to_json
@@ -129,6 +130,6 @@ class SpeakerTest < Test::Unit::TestCase
     assert_equal true, as_json.has_key?('model')
     assert_equal true, as_json.has_key?('mean_log_likelihood')
     assert_equal true, as_json.has_key?('supervector_hash')
-    assert_equal true, as_json.has_key?('supervector_sha')
+    assert_equal true, as_json.has_key?('sha')
   end
 end
