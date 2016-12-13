@@ -35,13 +35,17 @@ class SegmentTest < Test::Unit::TestCase
     assert_equal segment.uri, URI('http://example.com#t=2,7')
   end
 
-  def test_as_json
+  def test_as_json_and_to_json
     segment    = Diarize::Segment.new(OpenStruct.new({:base_uri => 'http://example.com'}), 2, 5, 'm', nil, 's1')
     model_file = File.join(File.dirname(__FILE__), 'data', 'speaker1.gmm')
     speaker    = Diarize::Speaker.new(URI.parse(""), "F", model_file)
     speaker.mean_log_likelihood = 0.9
-    segment.expects(:speaker).returns(speaker).twice
+    segment.expects(:speaker).returns(speaker).at_least(3)
     as_json = segment.as_json
+    assert_equal as_json, segment._as_json
+    assert_equal as_json, JSON.parse(segment.to_json)
+    assert_equal as_json, JSON.parse(segment._to_json)
+
     assert_equal true, as_json.has_key?('start')
     assert_equal true, as_json.has_key?('duration')
     assert_equal true, as_json.has_key?('gender')

@@ -51,9 +51,11 @@ module Diarize
         s['speaker'] = speaker.as_json if speaker
       }
     end
+    alias_method :_as_json, :as_json
 
     def to_json
       as_json.to_json
     end
+    alias_method :_to_json, :to_json
   end
 end

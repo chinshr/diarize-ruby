@@ -139,21 +139,14 @@ class SpeakerTest < Test::Unit::TestCase
     assert_equal true, to_rdf.include?("https://www.example.com/model/1")
   end
 
-  def test_as_json
+  def test_as_json_and_to_json
     speaker = Diarize::Speaker.new(URI.parse(""), "F", @model_file)
     speaker.mean_log_likelihood = 0.9
     as_json = speaker.as_json
-    assert_equal true, as_json.has_key?('gender')
-    assert_equal true, as_json.has_key?('model')
-    assert_equal true, as_json.has_key?('mean_log_likelihood')
-    assert_equal true, as_json.has_key?('supervector_hash')
-  end
+    assert_equal as_json, speaker._as_json
+    assert_equal as_json, JSON.parse(speaker.to_json)
+    assert_equal as_json, JSON.parse(speaker._to_json)
 
-  def test_to_json
-    speaker    = Diarize::Speaker.new(URI.parse(""), "F", @model_file)
-    speaker.mean_log_likelihood = 0.9
-    to_json    = speaker.to_json
-    as_json    = JSON.parse(to_json)
     assert_equal true, as_json.has_key?('gender')
     assert_equal true, as_json.has_key?('model')
     assert_equal true, as_json.has_key?('mean_log_likelihood')

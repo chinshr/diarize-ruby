@@ -171,10 +171,12 @@ module Diarize
         'supervector_hash' => supervector.hash.to_s
       }
     end
+    alias_method :_as_json, :as_json
 
     def to_json
       as_json.to_json
     end
+    alias_method :_to_json, :to_json
 
     protected
 
