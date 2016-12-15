@@ -32,7 +32,8 @@ class SuperVectorTest < Test::Unit::TestCase
   def test_hash
     model = Diarize::Speaker.load_model(File.join(File.dirname(__FILE__), 'data', 'speaker1.gmm'))
     sv = Diarize::SuperVector.generate_from_model(model)
-    assert_equal sv.vector.hash, sv.hash
+    assert_equal (previous_hash = sv.vector.to_a.hash), sv.hash
+    assert_equal previous_hash, sv.hash
   end
 
   def test_to_a
