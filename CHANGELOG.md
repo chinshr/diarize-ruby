@@ -1,3 +1,11 @@
+## [v0.4.0] - 2016-11-15
+
+- Add ruby GSL Math library
+
+## [v0.3.12] - 2016-11-14
+
+- Alias `_as_json` and `_to_json` to be used for Drb objects
+
 ## [v0.3.11] - 2016-11-30
 
 - Add `Segment#as_json` and `Segment#to_json`

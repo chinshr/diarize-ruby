@@ -5,12 +5,11 @@ RJB_OPTIONS   = ['-Xms16m', '-Xmx1024m']
 
 Rjb::load(RJB_LOAD_PATH, RJB_OPTIONS)
 
-require "matrix"
-
 require "uri"
 require "open-uri"
 require "digest"
 require "to_rdf"
+require "gsl"
 
 require "rjb/java_object_wrapper"
 
