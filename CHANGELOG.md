@@ -1,3 +1,7 @@
+## [v0.4.1] - 2016-11-15
+
+- Relax GSL version in gemspec
+
 ## [v0.4.0] - 2016-11-15
 
 - Add ruby GSL Math library
