@@ -1,3 +1,7 @@
+## [v0.4.1] - 2016-11-16
+
+- Provider DRb server `build_speaker`
+
 ## [v0.4.1] - 2016-11-15
 
 - Relax GSL version in gemspec

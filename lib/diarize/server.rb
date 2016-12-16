@@ -5,5 +5,9 @@ module Diarize
       Audio.new(url_or_uri)
     end
 
+    def build_speaker(uri = nil, gender = nil, model_file = nil)
+      Speaker.new(uri, gender, model_file)
+    end
+
   end
 end
